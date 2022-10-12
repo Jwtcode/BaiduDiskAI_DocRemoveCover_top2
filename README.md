@@ -1,1 +1,1 @@
-# BaiduDiskAI_DocRemoveCover_top3
+# 百度网盘AI大赛-文档去遮挡比赛第3名方案
