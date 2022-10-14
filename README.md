@@ -34,8 +34,7 @@
 将mask在原图中的位置的像素替换为mask在去遮挡图位置的像素。<br>
 
 - 网络主体架构为UNet，如图：
-![](![image](https://github.com/Jwtcode/BaiduDiskAI_DocRemoveCover_top3/blob/master/illustration/pipeline.png)
-
+![image](https://github.com/Jwtcode/BaiduDiskAI_DocRemoveCover_top3/blob/master/illustration/pipeline.png)
 从网络结构图上可以直观的看出改进后EraseNet变成了单分支网络，这是因为原版EraseNet的预测mask分支和第一阶段的Decoder存在冲突，所以我们去掉了预测mask分支，考虑到实效性，我们没有额外训练一个分割模型，而是选择检测模型(yolox)来获得mask。在损失函数上，原版的ErastNet使用了感知损失以及GAN损失，这个损失函数是为了生成更加逼真的背景，但是本赛题任务的背景都是纯色，所以这两个损失是不需要的。此外，EraseNet在多个尺度上使用了l1损失，我们只在第一阶段和第二阶段的最后一个尺度上使用了l1损失。此外，根据经验，我们将EraseNet的重建网络Refinement替换为了idr网络并在底层叠加了non-local结构。
 
 
