@@ -33,15 +33,11 @@
 - 替换mask所在区域<br>
 将mask在原图中的位置的像素替换为mask在去遮挡图位置的像素。<br>
 
-网络主体架构为UNet，如图：
+- 网络主体架构为UNet，如图：
+![](![image](https://github.com/Jwtcode/BaiduDiskAI_DocRemoveCover_top3/blob/master/illustration/pipeline.png)
 
-![](https://ai-studio-static-online.cdn.bcebos.com/c2ced773bf7b4d9db72ed48c4b92999964dd4198103c463282fa46a62cd9d319)
+从网络结构图上可以直观的看出改进后EraseNet变成了单分支网络，这是因为原版EraseNet的预测mask分支和第一阶段的Decoder存在冲突，所以我们去掉了预测mask分支，考虑到实效性，我们没有额外训练一个分割模型，而是选择检测模型(yolox)来获得mask。在损失函数上，原版的ErastNet使用了感知损失以及GAN损失，这个损失函数是为了生成更加逼真的背景，但是本赛题任务的背景都是纯色，所以这两个损失是不需要的。此外，EraseNet在多个尺度上使用了l1损失，我们只在第一阶段和第二阶段的最后一个尺度上使用了l1损失。此外，根据经验，我们将EraseNet的重建网络Refinement替换为了idr网络并在底层叠加了non-local结构。
 
-其中Encoder和Decoder采用NAFBlock:
-
-![](https://ai-studio-static-online.cdn.bcebos.com/a8b2262aaa144f8ea8c9c69087b0f93d988fc976e70e4e8ca61b2c0e88f274df)
-
-从网络结构图上可以直观的看出ErastNet是多分支以及多阶段网络，其中包括mask生成分支和两阶段图像生成分支。此外整个网络也都是基于多尺度结构。在损失函数上，原版的ErastNet使用了感知损失以及GAN损失，这个损失函数是为了生成更加逼真的背景，但是本赛题任务的背景都是纯色，所以这两个损失是不需要的，此外EraseNet在多个尺度上使用了l1损失，我们只在第一阶段和第二阶段的最后一个尺度上使用了l1损失。我们在训练第一阶段的过程中发现预测mask的分支和第一阶段的Decoder存在冲突，所以我们去除了预测mask的分支，考虑到实效性，我们没有额外训练一个分割模型，而是选择检测模型(yolox)来获得mask。此外，根据经验，我们将EraseNet的重建网络Refinement替换为了idr网络并在底层叠加了non-local结构。
 
 # 四、数据处理与增强
 
@@ -55,7 +51,10 @@
 - 增强使用横向左右翻转和小角度旋转
 
 # 五、训练细节
-- 
+- 训练配置
+总迭代数：450000 iteration<br>
+我们采用batch size为4和patch size为1024来进行训练450000次迭代。<br>
+我们采用了余弦退火的学习率策略来优化网络，学习率我们采用1e-4，优化器为Adam。<br>
 - 损失函数为L1Loss
 
 # 六、测试细节
